@@ -17,9 +17,11 @@ params = {
 def is_pending_order(status):
     """Check if the status is pending order status."""
     status = status.upper()
-    if ("COMPLETE" in status or "REJECT" in status or "CANCEL" in status):
-        return False
-    return True
+    return (
+        "COMPLETE" not in status
+        and "REJECT" not in status
+        and "CANCEL" not in status
+    )
 
 
 def setup_order_place(kiteconnect,
@@ -110,13 +112,14 @@ def cleanup_orders(kiteconnect, order_id=None):
     # If order is complete and CO/BO order then exit the orde
     if "COMPLETE" in status and variety in [kiteconnect.VARIETY_BO, kiteconnect.VARIETY_CO]:
         orders = kiteconnect.orders()
-        leg_order_id = None
-        for o in orders:
-            if o["parent_order_id"] == order_id:
-                leg_order_id = o["order_id"]
-                break
-
-        if leg_order_id:
+        if leg_order_id := next(
+            (
+                o["order_id"]
+                for o in orders
+                if o["parent_order_id"] == order_id
+            ),
+            None,
+        ):
             kiteconnect.exit_order(variety=variety, order_id=leg_order_id, parent_order_id=order_id)
 
 
@@ -138,7 +141,7 @@ def test_place_order_market_regular(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_place_order_limit_regular(kiteconnect):
@@ -157,7 +160,7 @@ def test_place_order_limit_regular(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_place_order_sl_regular(kiteconnect):
@@ -179,7 +182,7 @@ def test_place_order_sl_regular(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_place_order_slm_regular(kiteconnect):
@@ -200,7 +203,7 @@ def test_place_order_slm_regular(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_place_order_tag(kiteconnect):
@@ -220,7 +223,7 @@ def test_place_order_tag(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_place_order_co_market(kiteconnect):
@@ -239,7 +242,7 @@ def test_place_order_co_market(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_place_order_co_limit(kiteconnect):
@@ -258,7 +261,7 @@ def test_place_order_co_limit(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 # Regular order modify and cancel
 ################################
@@ -292,8 +295,9 @@ def setup_order_modify_cancel(kiteconnect, variety):
 
 def test_order_cancel_regular(kiteconnect):
     """Regular order cancel."""
-    setup = setup_order_modify_cancel(kiteconnect, kiteconnect.VARIETY_REGULAR)
-    if setup:
+    if setup := setup_order_modify_cancel(
+        kiteconnect, kiteconnect.VARIETY_REGULAR
+    ):
         updated_params, order_id, order = setup
     else:
         return
@@ -309,13 +313,14 @@ def test_order_cancel_regular(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_order_modify_limit_regular(kiteconnect):
     """Modify limit regular."""
-    setup = setup_order_modify_cancel(kiteconnect, kiteconnect.VARIETY_REGULAR)
-    if setup:
+    if setup := setup_order_modify_cancel(
+        kiteconnect, kiteconnect.VARIETY_REGULAR
+    ):
         updated_params, order_id, order = setup
     else:
         return
@@ -335,12 +340,13 @@ def test_order_modify_limit_regular(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_order_cancel_amo(kiteconnect):
-    setup = setup_order_modify_cancel(kiteconnect, kiteconnect.VARIETY_AMO)
-    if setup:
+    if setup := setup_order_modify_cancel(
+        kiteconnect, kiteconnect.VARIETY_AMO
+    ):
         updated_params, order_id, order = setup
     else:
         return
@@ -356,12 +362,13 @@ def test_order_cancel_amo(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 
 def test_order_modify_limit_amo(kiteconnect):
-    setup = setup_order_modify_cancel(kiteconnect, kiteconnect.VARIETY_AMO)
-    if setup:
+    if setup := setup_order_modify_cancel(
+        kiteconnect, kiteconnect.VARIETY_AMO
+    ):
         updated_params, order_id, order = setup
     else:
         return
@@ -381,7 +388,7 @@ def test_order_modify_limit_amo(kiteconnect):
     try:
         cleanup_orders(kiteconnect, order_id)
     except Exception as e:
-        warnings.warn(UserWarning("Error while cleaning up orders: {}".format(e)))
+        warnings.warn(UserWarning(f"Error while cleaning up orders: {e}"))
 
 # CO order modify/cancel and exit
 #################################

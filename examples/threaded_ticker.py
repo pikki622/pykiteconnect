@@ -27,15 +27,15 @@ tokens = [738561]
 # Callback for tick reception.
 def on_ticks(ws, ticks):
     if len(ticks) > 0:
-        logging.info("Current mode: {}".format(ticks[0]["mode"]))
+        logging.info(f'Current mode: {ticks[0]["mode"]}')
 
 
 # Callback for successful connection.
 def on_connect(ws, response):
-    logging.info("Successfully connected. Response: {}".format(response))
+    logging.info(f"Successfully connected. Response: {response}")
     ws.subscribe(tokens)
     ws.set_mode(ws.MODE_FULL, tokens)
-    logging.info("Subscribe to tokens in Full mode: {}".format(tokens))
+    logging.info(f"Subscribe to tokens in Full mode: {tokens}")
 
 
 # Callback when current connection is closed.
@@ -50,7 +50,7 @@ def on_error(ws, code, reason):
 
 # Callback when reconnect is on progress
 def on_reconnect(ws, attempts_count):
-    logging.info("Reconnecting: {}".format(attempts_count))
+    logging.info(f"Reconnecting: {attempts_count}")
 
 
 # Callback when all reconnect failed (exhausted max retries)
@@ -76,12 +76,11 @@ logging.info("This is main thread. Will change webosocket mode every 5 seconds."
 count = 0
 while True:
     count += 1
-    if count % 2 == 0:
-        if kws.is_connected():
+    if kws.is_connected():
+        if count % 2 == 0:
             logging.info("### Set mode to LTP for all tokens")
             kws.set_mode(kws.MODE_LTP, tokens)
-    else:
-        if kws.is_connected():
+        else:
             logging.info("### Set mode to quote for all tokens")
             kws.set_mode(kws.MODE_QUOTE, tokens)
 

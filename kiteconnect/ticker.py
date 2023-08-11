@@ -90,26 +90,26 @@ class KiteTickerClientProtocol(WebSocketClientProtocol):
         if self._next_pong_check:
             self._next_pong_check.cancel()
 
-    def onPong(self, response):  # noqa
+    def onPong(self, response):    # noqa
         """Called when pong message is received."""
         if self._last_pong_time and self.factory.debug:
-            log.debug("last pong was {} seconds back.".format(time.time() - self._last_pong_time))
+            log.debug(f"last pong was {time.time() - self._last_pong_time} seconds back.")
 
         self._last_pong_time = time.time()
 
         if self.factory.debug:
-            log.debug("pong => {}".format(response))
+            log.debug(f"pong => {response}")
 
     """
     Custom helper and exposed methods.
     """
 
-    def _loop_ping(self):  # noqa
+    def _loop_ping(self):    # noqa
         """Start a ping loop where it sends ping message every X seconds."""
         if self.factory.debug:
-            log.debug("ping => {}".format(self._ping_message))
+            log.debug(f"ping => {self._ping_message}")
             if self._last_ping_time:
-                log.debug("last ping was {} seconds back.".format(time.time() - self._last_ping_time))
+                log.debug(f"last ping was {time.time() - self._last_ping_time} seconds back.")
 
         # Set current time as last ping time
         self._last_ping_time = time.time()
@@ -130,8 +130,9 @@ class KiteTickerClientProtocol(WebSocketClientProtocol):
             last_pong_diff = time.time() - self._last_pong_time
             if last_pong_diff > (2 * self.PING_INTERVAL):
                 if self.factory.debug:
-                    log.debug("Last pong was {} seconds ago. So dropping connection to reconnect.".format(
-                        last_pong_diff))
+                    log.debug(
+                        f"Last pong was {last_pong_diff} seconds ago. So dropping connection to reconnect."
+                    )
                 # drop existing connection to avoid ghost connection
                 self.dropConnection(abort=True)
 
@@ -169,10 +170,12 @@ class KiteTickerClientFactory(WebSocketClientFactory, ReconnectingClientFactory)
 
         self._last_connection_time = time.time()
 
-    def clientConnectionFailed(self, connector, reason):  # noqa
+    def clientConnectionFailed(self, connector, reason):    # noqa
         """On connection failure (When connect request fails)"""
         if self.retries > 0:
-            log.error("Retrying connection. Retry attempt count: {}. Next retry in around: {} seconds".format(self.retries, int(round(self.delay))))
+            log.error(
+                f"Retrying connection. Retry attempt count: {self.retries}. Next retry in around: {int(round(self.delay))} seconds"
+            )
 
             # on reconnect callback
             if self.on_reconnect:
@@ -197,7 +200,7 @@ class KiteTickerClientFactory(WebSocketClientFactory, ReconnectingClientFactory)
         """Callback `no_reconnect` if max retries are exhausted."""
         if self.maxRetries is not None and (self.retries > self.maxRetries):
             if self.debug:
-                log.debug("Maximum retries ({}) exhausted.".format(self.maxRetries))
+                log.debug(f"Maximum retries ({self.maxRetries}) exhausted.")
                 # Stop the loop for exceeding max retry attempts
                 self.stop()
 
@@ -495,7 +498,7 @@ class KiteTicker(object):
         self.factory.maxRetries = self.reconnect_max_tries
 
     def _user_agent(self):
-        return (__title__ + "-python/").capitalize() + __version__
+        return f"{__title__}-python/".capitalize() + __version__
 
     def connect(self, threaded=False, disable_ssl_verification=False, proxy=None):
         """
@@ -526,11 +529,10 @@ class KiteTicker(object):
         if self.debug:
             twisted_log.startLogging(sys.stdout)
 
-        # Run in seperate thread of blocking
-        opts = {}
-
-        # Run when reactor is not running
         if not reactor.running:
+            # Run in seperate thread of blocking
+            opts = {}
+
             if threaded:
                 # Signals are not allowed in non main thread by twisted so suppress it.
                 opts["installSignalHandlers"] = False
@@ -542,10 +544,7 @@ class KiteTicker(object):
 
     def is_connected(self):
         """Check if WebSocket connection is established."""
-        if self.ws and self.ws.state == self.ws.STATE_OPEN:
-            return True
-        else:
-            return False
+        return bool(self.ws and self.ws.state == self.ws.STATE_OPEN)
 
     def _close(self, code=None, reason=None):
         """Close the WebSocket connection."""
@@ -584,7 +583,7 @@ class KiteTicker(object):
 
             return True
         except Exception as e:
-            self._close(reason="Error while subscribe: {}".format(str(e)))
+            self._close(reason=f"Error while subscribe: {str(e)}")
             raise
 
     def unsubscribe(self, instrument_tokens):
@@ -606,7 +605,7 @@ class KiteTicker(object):
 
             return True
         except Exception as e:
-            self._close(reason="Error while unsubscribe: {}".format(str(e)))
+            self._close(reason=f"Error while unsubscribe: {str(e)}")
             raise
 
     def set_mode(self, mode, instrument_tokens):
@@ -628,7 +627,7 @@ class KiteTicker(object):
 
             return True
         except Exception as e:
-            self._close(reason="Error while setting mode: {}".format(str(e)))
+            self._close(reason=f"Error while setting mode: {str(e)}")
             raise
 
     def resubscribe(self):
@@ -645,7 +644,7 @@ class KiteTicker(object):
 
         for mode in modes:
             if self.debug:
-                log.debug("Resubscribe and set mode: {} - {}".format(mode, modes[mode]))
+                log.debug(f"Resubscribe and set mode: {mode} - {modes[mode]}")
 
             self.subscribe(modes[mode])
             self.set_mode(mode, modes[mode])
@@ -657,14 +656,14 @@ class KiteTicker(object):
 
     def _on_close(self, ws, code, reason):
         """Call `on_close` callback when connection is closed."""
-        log.error("Connection closed: {} - {}".format(code, str(reason)))
+        log.error(f"Connection closed: {code} - {str(reason)}")
 
         if self.on_close:
             self.on_close(self, code, reason)
 
     def _on_error(self, ws, code, reason):
         """Call `on_error` callback when connection throws an error."""
-        log.error("Connection error: {} - {}".format(code, str(reason)))
+        log.error(f"Connection error: {code} - {str(reason)}")
 
         if self.on_error:
             self.on_error(self, code, reason)
@@ -738,7 +737,7 @@ class KiteTicker(object):
                 divisor = 100.0
 
             # All indices are not tradable
-            tradable = False if segment == self.EXCHANGE_MAP["indices"] else True
+            tradable = segment != self.EXCHANGE_MAP["indices"]
 
             # LTP packets
             if len(packet) == 8:
@@ -748,8 +747,7 @@ class KiteTicker(object):
                     "instrument_token": instrument_token,
                     "last_price": self._unpack_int(packet, 4, 8) / divisor
                 })
-            # Indices quote and full mode
-            elif len(packet) == 28 or len(packet) == 32:
+            elif len(packet) in {28, 32}:
                 mode = self.MODE_QUOTE if len(packet) == 28 else self.MODE_FULL
 
                 d = {
@@ -761,12 +759,11 @@ class KiteTicker(object):
                         "high": self._unpack_int(packet, 8, 12) / divisor,
                         "low": self._unpack_int(packet, 12, 16) / divisor,
                         "open": self._unpack_int(packet, 16, 20) / divisor,
-                        "close": self._unpack_int(packet, 20, 24) / divisor
-                    }
+                        "close": self._unpack_int(packet, 20, 24) / divisor,
+                    },
+                    "change": 0,
                 }
 
-                # Compute the change price using close price and last price
-                d["change"] = 0
                 if (d["ohlc"]["close"] != 0):
                     d["change"] = (d["last_price"] - d["ohlc"]["close"]) * 100 / d["ohlc"]["close"]
 
@@ -780,8 +777,7 @@ class KiteTicker(object):
                     d["exchange_timestamp"] = timestamp
 
                 data.append(d)
-            # Quote and full mode
-            elif len(packet) == 44 or len(packet) == 184:
+            elif len(packet) in {44, 184}:
                 mode = self.MODE_QUOTE if len(packet) == 44 else self.MODE_FULL
 
                 d = {
@@ -790,7 +786,8 @@ class KiteTicker(object):
                     "instrument_token": instrument_token,
                     "last_price": self._unpack_int(packet, 4, 8) / divisor,
                     "last_traded_quantity": self._unpack_int(packet, 8, 12),
-                    "average_traded_price": self._unpack_int(packet, 12, 16) / divisor,
+                    "average_traded_price": self._unpack_int(packet, 12, 16)
+                    / divisor,
                     "volume_traded": self._unpack_int(packet, 16, 20),
                     "total_buy_quantity": self._unpack_int(packet, 20, 24),
                     "total_sell_quantity": self._unpack_int(packet, 24, 28),
@@ -798,12 +795,11 @@ class KiteTicker(object):
                         "open": self._unpack_int(packet, 28, 32) / divisor,
                         "high": self._unpack_int(packet, 32, 36) / divisor,
                         "low": self._unpack_int(packet, 36, 40) / divisor,
-                        "close": self._unpack_int(packet, 40, 44) / divisor
-                    }
+                        "close": self._unpack_int(packet, 40, 44) / divisor,
+                    },
+                    "change": 0,
                 }
 
-                # Compute the change price using close price and last price
-                d["change"] = 0
                 if (d["ohlc"]["close"] != 0):
                     d["change"] = (d["last_price"] - d["ohlc"]["close"]) * 100 / d["ohlc"]["close"]
 
@@ -847,7 +843,7 @@ class KiteTicker(object):
 
     def _unpack_int(self, bin, start, end, byte_format="I"):
         """Unpack binary data as unsgined interger."""
-        return struct.unpack(">" + byte_format, bin[start:end])[0]
+        return struct.unpack(f">{byte_format}", bin[start:end])[0]
 
     def _split_packets(self, bin):
         """Split the data to individual packets of ticks."""
@@ -859,7 +855,7 @@ class KiteTicker(object):
         packets = []
 
         j = 2
-        for i in range(number_of_packets):
+        for _ in range(number_of_packets):
             packet_length = self._unpack_int(bin, j, j + 2, byte_format="H")
             packets.append(bin[j + 2: j + 2 + packet_length])
             j = j + 2 + packet_length

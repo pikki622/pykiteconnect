@@ -25,11 +25,11 @@ class TestKiteConnectObject:
         assert kiteconnect.login_url() == "https://kite.zerodha.com/connect/login?api_key=<API-KEY>&v=3"
 
     def test_request_without_pooling(self, kiteconnect):
-        assert isinstance(kiteconnect.reqsession, requests.Session) is True
+        assert isinstance(kiteconnect.reqsession, requests.Session)
         assert kiteconnect.reqsession.request is not None
 
     def test_request_pooling(self, kiteconnect_with_pooling):
-        assert isinstance(kiteconnect_with_pooling.reqsession, requests.Session) is True
+        assert isinstance(kiteconnect_with_pooling.reqsession, requests.Session)
         assert kiteconnect_with_pooling.reqsession.request is not None
         http_adapter = kiteconnect_with_pooling.reqsession.adapters['https://']
         assert http_adapter._pool_maxsize == 10

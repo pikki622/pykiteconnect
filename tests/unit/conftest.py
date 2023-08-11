@@ -20,17 +20,16 @@ def kiteconnect():
 @pytest.fixture()
 def kiteconnect_with_pooling():
     """Init kite connect object with pooling."""
-    kiteconnect = KiteConnect(
+    return KiteConnect(
         api_key="<API-KEY>",
         access_token="<ACCESS-TOKEN>",
         pool={
             "pool_connections": 20,
             "pool_maxsize": 10,
             "max_retries": 2,
-            "pool_block": False
-        }
+            "pool_block": False,
+        },
     )
-    return kiteconnect
 
 
 @pytest.fixture()
