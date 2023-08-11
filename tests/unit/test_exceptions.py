@@ -9,9 +9,9 @@ import kiteconnect.exceptions as ex
 def test_wrong_json_response(kiteconnect):
     responses.add(
         responses.GET,
-        "%s%s" % (kiteconnect.root, kiteconnect._routes["portfolio.positions"]),
+        f'{kiteconnect.root}{kiteconnect._routes["portfolio.positions"]}',
         body="{a:b}",
-        content_type="application/json"
+        content_type="application/json",
     )
     with pytest.raises(ex.DataException) as exc:
         kiteconnect.positions()
@@ -24,9 +24,9 @@ def test_wrong_content_type(kiteconnect):
     rdf_data = "<rdf:Description rdf:about=''><rdfs:label>zerodha</rdfs:label></rdf:Description"
     responses.add(
         responses.GET,
-        "%s%s" % (kiteconnect.root, kiteconnect._routes["portfolio.positions"]),
+        f'{kiteconnect.root}{kiteconnect._routes["portfolio.positions"]}',
         body=rdf_data,
-        content_type="application/rdf+xml"
+        content_type="application/rdf+xml",
     )
     with pytest.raises(ex.DataException) as exc:
         kiteconnect.positions()
@@ -47,9 +47,9 @@ def test_wrong_content_type(kiteconnect):
 def test_native_exceptions(error_type, message, kiteconnect):
     responses.add(
         responses.GET,
-        "%s%s" % (kiteconnect.root, kiteconnect._routes["portfolio.positions"]),
+        f'{kiteconnect.root}{kiteconnect._routes["portfolio.positions"]}',
         body='{"error_type": "%s", "message": "%s"}' % (error_type, message),
-        content_type="application/json"
+        content_type="application/json",
     )
     with pytest.raises(getattr(ex, error_type, ex.GeneralException)) as exc:
         kiteconnect.positions()

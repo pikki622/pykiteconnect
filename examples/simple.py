@@ -26,9 +26,9 @@ try:
         order_type=kite.ORDER_TYPE_MARKET
     )
 
-    logging.info("Order placed. ID is: {}".format(order_id))
+    logging.info(f"Order placed. ID is: {order_id}")
 except Exception as e:
-    logging.info("Order placement failed: {}".format(e))
+    logging.info(f"Order placement failed: {e}")
 
 # Fetch all orders
 kite.orders()

@@ -26,9 +26,9 @@ try:
         "price": 470,
     }]
     single_gtt = kite.place_gtt(trigger_type=kite.GTT_TYPE_SINGLE, tradingsymbol="SBIN", exchange="NSE", trigger_values=[470], last_price=473, orders=order_single)
-    logging.info("single leg gtt order trigger_id : {}".format(single_gtt['trigger_id']))
+    logging.info(f"single leg gtt order trigger_id : {single_gtt['trigger_id']}")
 except Exception as e:
-    logging.info("Error placing single leg gtt order: {}".format(e))
+    logging.info(f"Error placing single leg gtt order: {e}")
 
 
 # Place two-leg(OCO) gtt order - https://kite.trade/docs/connect/v3/gtt/#two-leg
@@ -51,6 +51,6 @@ try:
         "price": 480
     }]
     gtt_oco = kite.place_gtt(trigger_type=kite.GTT_TYPE_OCO, tradingsymbol="SBIN", exchange="NSE", trigger_values=[470,480], last_price=473, orders=order_oco)
-    logging.info("GTT OCO trigger_id : {}".format(gtt_oco['trigger_id']))
+    logging.info(f"GTT OCO trigger_id : {gtt_oco['trigger_id']}")
 except Exception as e:
-    logging.info("Error placing gtt oco order: {}".format(e))
+    logging.info(f"Error placing gtt oco order: {e}")

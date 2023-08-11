@@ -242,7 +242,7 @@ class KiteConnect(object):
 
     def login_url(self):
         """Get the remote login url to which a user should be redirected to initiate the login flow."""
-        return "%s?api_key=%s&v=%s" % (self._default_login_uri, self.api_key, self.kite_header_version)
+        return f"{self._default_login_uri}?api_key={self.api_key}&v={self.kite_header_version}"
 
     def generate_session(self, request_token, api_secret):
         """
@@ -576,7 +576,7 @@ class KiteConnect(object):
         ins = list(instruments)
 
         # If first element is a list then accept it as instruments list for legacy reason
-        if len(instruments) > 0 and type(instruments[0]) == list:
+        if instruments and type(instruments[0]) == list:
             ins = instruments[0]
 
         data = self._get("market.quote", params={"i": ins})
@@ -591,7 +591,7 @@ class KiteConnect(object):
         ins = list(instruments)
 
         # If first element is a list then accept it as instruments list for legacy reason
-        if len(instruments) > 0 and type(instruments[0]) == list:
+        if instruments and type(instruments[0]) == list:
             ins = instruments[0]
 
         return self._get("market.quote.ohlc", params={"i": ins})
@@ -605,7 +605,7 @@ class KiteConnect(object):
         ins = list(instruments)
 
         # If first element is a list then accept it as instruments list for legacy reason
-        if len(instruments) > 0 and type(instruments[0]) == list:
+        if instruments and type(instruments[0]) == list:
             ins = instruments[0]
 
         return self._get("market.quote.ltp", params={"i": ins})
@@ -663,7 +663,7 @@ class KiteConnect(object):
         ins = list(instruments)
 
         # If first element is a list then accept it as instruments list for legacy reason
-        if len(instruments) > 0 and type(instruments[0]) == list:
+        if instruments and type(instruments[0]) == list:
             ins = instruments[0]
 
         return self._get("market.trigger_range",
@@ -854,7 +854,7 @@ class KiteConnect(object):
         return records
 
     def _user_agent(self):
-        return (__title__ + "-python/").capitalize() + __version__
+        return f"{__title__}-python/".capitalize() + __version__
 
     def _get(self, route, url_args=None, params=None, is_json=False):
         """Alias for sending a GET request."""
@@ -890,8 +890,8 @@ class KiteConnect(object):
 
         if self.api_key and self.access_token:
             # set authorization header
-            auth_header = self.api_key + ":" + self.access_token
-            headers["Authorization"] = "token {}".format(auth_header)
+            auth_header = f"{self.api_key}:{self.access_token}"
+            headers["Authorization"] = f"token {auth_header}"
 
         if self.debug:
             log.debug("Request: {method} {url} {params} {headers}".format(method=method, url=url, params=params, headers=headers))

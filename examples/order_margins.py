@@ -28,8 +28,8 @@ try:
         }]
 
     margin_detail = kite.order_margins(order_param_single)
-    logging.info("Required margin for single order: {}".format(margin_detail))    
-    
+    logging.info(f"Required margin for single order: {margin_detail}")    
+
     # Fetch margin detail for list of orders 
     order_param_multi = [{
         "exchange": "NSE",
@@ -61,7 +61,7 @@ try:
     }]
 
     margin_detail = kite.order_margins(order_param_multi)
-    logging.info("Required margin for order_list: {}".format(margin_detail))
+    logging.info(f"Required margin for order_list: {margin_detail}")
 
     # Basket orders
     order_param_basket = [
@@ -74,7 +74,7 @@ try:
         "order_type": "MARKET",
         "quantity": 75
     },
-	{
+    {
         "exchange": "NFO",
         "tradingsymbol": "NIFTY21JUN14450PE",
         "transaction_type": "SELL",
@@ -85,13 +85,15 @@ try:
     }]
 
     margin_amount = kite.basket_order_margins(order_param_basket)
-    logging.info("Required margin for basket order: {}".format(margin_amount))
+    logging.info(f"Required margin for basket order: {margin_amount}")
     # Compact margin response
     margin_amount_comt = kite.basket_order_margins(order_param_basket, mode='compact')
-    logging.info("Required margin for basket order in compact form: {}".format(margin_amount_comt))
+    logging.info(
+        f"Required margin for basket order in compact form: {margin_amount_comt}"
+    )
 
 except Exception as e:
-    logging.info("Error fetching order margin: {}".format(e))
+    logging.info(f"Error fetching order margin: {e}")
 
 
 # Fetch virtual contract note charges
@@ -132,6 +134,6 @@ try:
         }]
 
     order_book_charges = kite.get_virtual_contract_note(order_book_params)
-    logging.info("Virtual contract note charges: {}".format(order_book_charges))
+    logging.info(f"Virtual contract note charges: {order_book_charges}")
 except Exception as e:
-    logging.info("Error fetching virtual contract note charges: {}".format(e))
+    logging.info(f"Error fetching virtual contract note charges: {e}")
